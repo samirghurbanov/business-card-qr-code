@@ -28,7 +28,12 @@
                 <div class="form-group">
                     <label for="phone">Phone Number *</label>
                     <div class="phone-input-wrapper">
-                        <span class="phone-prefix">+971</span>
+                        <div class="prefix-wrapper">
+                            <select id="phonePrefix" class="phone-prefix">
+                                <option value="+971">+971 🇦🇪</option>
+                                <option value="+966">+966 🇸🇦</option>
+                            </select>
+                        </div>
                         <input type="tel" id="phoneNumber" required placeholder="501234567" pattern="[0-9]{9}"
                             maxlength="9">
                     </div>

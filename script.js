@@ -13,39 +13,40 @@ document.getElementById('contactForm').addEventListener('submit', function (e) {
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const phoneNumber = document.getElementById('phoneNumber').value.trim();
-    const phone = '+971' + phoneNumber; // Combine prefix with number
+    const phonePrefix = document.getElementById('phonePrefix').value;
+    const phone = phonePrefix + phoneNumber; // Combine prefix with number
     const email = document.getElementById('email').value.trim();
     const company = document.getElementById('company').value.trim();
     const title = document.getElementById('title').value.trim();
     const website = document.getElementById('website').value.trim();
 
-    // Create vCard format
-    let vcard = 'BEGIN:VCARD\n';
-    vcard += 'VERSION:3.0\n';
-    vcard += `N:${lastName};${firstName};;;\n`;
-    vcard += `FN:${firstName} ${lastName}\n`;
+    // Create vCard format (RFC 6350 requires CRLF line endings)
+    let vcard = 'BEGIN:VCARD\r\n';
+    vcard += 'VERSION:3.0\r\n';
+    vcard += `N:${lastName};${firstName};;;\r\n`;
+    vcard += `FN:${firstName} ${lastName}\r\n`;
 
     if (phone) {
-        vcard += `TEL;TYPE=CELL:${phone}\n`;
+        vcard += `TEL;TYPE=CELL:${phone}\r\n`;
     }
 
     if (email) {
-        vcard += `EMAIL:${email}\n`;
+        vcard += `EMAIL:${email}\r\n`;
     }
 
     if (company) {
-        vcard += `ORG:${company}\n`;
+        vcard += `ORG:${company}\r\n`;
     }
 
     if (title) {
-        vcard += `TITLE:${title}\n`;
+        vcard += `TITLE:${title}\r\n`;
     }
 
     if (website) {
-        vcard += `URL:${website}\n`;
+        vcard += `URL:${website}\r\n`;
     }
 
-    vcard += 'END:VCARD';
+    vcard += 'END:VCARD\r\n';
 
     // Clear previous QR code
     const qrcodeDiv = document.getElementById('qrcode');
@@ -85,8 +86,20 @@ document.getElementById('downloadBtn').addEventListener('click', function () {
         return;
     }
 
-    // Convert canvas to blob and download
-    canvas.toBlob(function (blob) {
+    // Add a white quiet zone (border) around the QR code for reliable scanning
+    const padding = 40;
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvas.width + padding * 2;
+    exportCanvas.height = canvas.height + padding * 2;
+
+    const ctx = exportCanvas.getContext('2d');
+    // Fill white background (quiet zone)
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    // Draw the QR code centred inside the padding
+    ctx.drawImage(canvas, padding, padding);
+
+    exportCanvas.toBlob(function (blob) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         const firstName = document.getElementById('firstName').value.trim();
